@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link href="https://fonts.googleapis.com/css?family=Gamja+Flower|Hi+Melodydisplay=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/rpsgame.css') }}" />
+    <title>RPS GAME</title>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar__logo">
+        </div>
+        <ul class="navbar__menu">
+            <li><a class="a" href=" {{ url_for('index') }}">게임하기</a></li>
+            <li><a class="a" href="{{ url_for('score') }}">전적확인하기</a></li>
+        </ul>
+    </nav>
+    <div class="wrapper">
+        <h1>🌳야생의 가위바위보🌳</h1>
+        <div class="button-container hidden">
+            <button class="restart-button">다시하기</button>
+        </div>
+        <div class="score-container">
+            <div class="score-board">
+                <div class="badge" id="user-label">수강생</div>
+                <div class="badge" id="computer-label">튜터</div>
+                <div><span id="user-score">0</span>:<span id="computer-score">0</span></div>
+            </div>
+        </div>
+
+        <div class="chose-container">
+            <h3>야생의 튜터가 갑자기 숲속에서 나타났습니다.</h3>
+            <h3>튜터가 가위바위보를 제안합니다. 지면 끌려갈듯합니다.</h3>
+            <div class="chose-inner-container">
+                <div class="chose">
+                    <i class="fas fa-hand-scissors fa-4x icon" id="scissors"></i>
+                </div>
+                <div class="chose">
+                    <i class="fas fa-hand-rock fa-4x icon" id="rock"></i>
+                </div>
+                <div class="chose">
+                    <i class="fas fa-hand-paper fa-4x icon" id="paper"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal hidden">
+        <div class="modal-content">
+            <h2></h2>
+            <i class="fas fa-hand-rock fa-5x"></i>
+            <p></p> 
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='/js/rpsgame.js') }}"></script>
+    <script src="https://kit.fontawesome.com/1433f86547.js" crossorigin="anonymous"></script>
+</body>
+
+</html>

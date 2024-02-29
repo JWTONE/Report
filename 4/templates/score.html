@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Gamja+Flower|Hi+Melody&display=swap" rel="stylesheet" />
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='/css/rpsgame.css') }}" /> -->
+    <title>RPS Scores</title>
+    <style>
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar__logo">
+        </div>
+        <ul class="navbar__menu">
+            <li><a href=" {{ url_for('index') }}">게임하기</a></li>
+            <li><a href="{{ url_for('score') }}">전적확인하기</a></li>
+        </ul>
+    </nav>
+    <h1>Rock, Paper, Scissors Scores</h1>
+    <table>
+        <tr>
+            <th>Player</th>
+            <th>Score</th>
+            <th>Wins</th>
+            <th>Loses</th>
+            <th>Draws</th>
+        </tr>
+        <tr>
+            <td>수강생</td>
+            <td id="user-score">{{ user_score }}</td>
+            <td id="user-wins">{{ user_wins }}</td>
+            <td id="user-loses">{{ user_loses }}</td>
+            <td id="user-draws">{{ user_draws }}</td>
+        </tr>
+        <tr>
+            <td>튜터</td>
+            <td id="computer-score">{{ computer_score }}</td>
+            <td id="computer-wins">{{ computer_wins }}</td>
+            <td id="computer-loses">{{ computer_loses }}</td>
+            <td id="computer-draws">{{ computer_draws }}</td>
+        </tr>
+    </table>
+</body>
+
+</html>
