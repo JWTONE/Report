@@ -3,41 +3,83 @@ import sqlite3
 import os
 from flask_sqlalchemy import SQLAlchemy
 
-basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
-    basedir, "database.db"
-)
-app = Flask(__name__, static_url_path='/static')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # SQLite를 사용하는 예시
+db = SQLAlchemy(app)
 
-# SQLite 데이터베이스 초기화
-conn = sqlite3.connect('rps_scores.db')
-cursor = conn.cursor()
-cursor.execute('CREATE TABLE IF NOT EXISTS scores (id INTEGER PRIMARY KEY AUTOINCREMENT, user_score INTEGER, computer_score INTEGER);')
-cursor.execute('CREATE TABLE IF NOT EXISTS results (id INTEGER PRIMARY KEY AUTOINCREMENT, user_wins INTEGER, user_loses INTEGER, user_draws INTEGER, computer_wins INTEGER, computer_loses INTEGER, computer_draws INTEGER);')
-conn.commit()
-conn.close()
+class Score(db.Model):
+    __table_name__ = 'score'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    profile_image = db.Column(db.String(100), default='default.png')
+
+    def __repr__(self):
+        return f"<User('{self.id}', '{self.username}', '{self.email}')>"
 
 
-# 점수를 데이터베이스에 추가하는 함수
-def add_score(result):
-    conn = sqlite3.connect('rps_scores.db')
-    cursor = conn.cursor()
+@app.route('/play_game', methods=['POST'])
+def play_game():
+    user_choice = request.form.get('user_choice')
+    comp_choice = get_computer_choice()
+
+    result = determine_winner(user_choice, comp_choice)
+
+    update_score(result)
+
+    return jsonify({'result': result, 'comp_choice': comp_choice})
+
+def get_computer_choice():
+    # 여기에 컴퓨터가 무작위로 가위, 바위, 보 중 하나를 선택하는 코드 추가
+    pass
+
+def determine_winner(user_choice, comp_choice):
+    # 여기에 가위바위보 승패를 판단하는 코드 추가
+    # 결과에 따라 'user', 'comp', 'draw' 등을 반환
+    pass
+
+def update_score(result):
+    score_entry = Score.query.first()
+    if score_entry is None:
+        score_entry = Score()
+
     if result == 'user':
-        cursor.execute('UPDATE scores SET user_score = user_score + 1;')
+        score_entry.user_score += 1
     elif result == 'comp':
-        cursor.execute('UPDATE scores SET computer_score = computer_score + 1;')
-    conn.commit()
-    conn.close()
+        score_entry.computer_score += 1
 
-# 점수를 가져오는 함수
-def get_scores():
-    conn = sqlite3.connect('rps_scores.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT user_score, computer_score FROM scores;')
-    scores = cursor.fetchone()
-    conn.close()
-    return scores
+    db.session.add(score_entry)
+    db.session.commit()
+
+@app.route('/update_score_data', methods=['POST'])
+def update_score_data():
+    data = request.json
+    user_score = data.get('userScore')
+    computer_score = data.get('computerScore')
+
+    # 디버깅 코드 추가
+    print(f"Received data: userScore={user_score}, computerScore={computer_score}")
+
+    # 데이터베이스 업데이트
+    score_entry = Score.query.first()
+    if score_entry is None:
+        score_entry = Score()
+    score_entry.user_score = user_score
+    score_entry.computer_score = computer_score
+
+    # 디버깅 코드 추가
+    print(f"Before commit: user_score={score_entry.user_score}, computer_score={score_entry.computer_score}")
+
+    db.session.add(score_entry)
+    db.session.commit()
+
+    # 디버깅 코드 추가
+    print(f"After commit: user_score={score_entry.user_score}, computer_score={score_entry.computer_score}")
+
+    return jsonify({'success': True})
+
 
 # Flask 라우트
 @app.route('/')
@@ -48,38 +90,8 @@ def index():
 def score():
     return render_template('score.html')
 
-# JavaScript에서 호출하는 엔드포인트
-@app.route('/change-score/<result>', methods=['GET'])
-def change_score(result):
-    add_score(result)
-    return 'Score changed successfully'
-
-# JavaScript에서 호출하는 엔드포인트
-@app.route('/get-scores', methods=['GET'])
-def get_scores_route():
-    scores = get_scores()
-    return jsonify({'user_Score': scores[0], 'computer_Score': scores[1]})
-
-# @app.route('/test', methods=['GET'])
-# def test():
-#     # js -> app.py 
-#     # user : paper, computer : rock, result : win
-#     # save to db
-#     # insert into 'tablename' values (user, computer, result)
-#     scores = get_scores()
-#     return jsonify({'user_Score': scores[0], 'computer_Score': scores[1]})
-
-@app.route('/save_result', methods=['GET'])
-def save_result():
-    user_choice = request.args.get('user_choice')
-    comp_choice = request.args.get('comp_choice')
-    result = request.args.get('result')
-
-    # 여기에서 데이터베이스에 저장하는 로직을 추가하면 됩니다.
-
-    return "데이터가 성공적으로 저장되었습니다."
-
 if __name__ == '__main__':
+    db.create_all()
     app.run(debug=True)
 
 

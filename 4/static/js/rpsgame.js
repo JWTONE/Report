@@ -28,21 +28,38 @@ function compare(user, comp) {
     }
 }
 
-
 function changeScore(result) {
     const userScoreSpan = document.querySelector('#user-score');
     const computerScoreSpan = document.querySelector('#computer-score');
     let userScore = Number(userScoreSpan.textContent);
     let computerScore = Number(computerScoreSpan.textContent);
+
     if (result === 'user') {
         userScore++;
         userScoreSpan.textContent = userScore;
-    }
-    else if (result === 'comp') {
+    } else if (result === 'comp') {
         computerScore++;
         computerScoreSpan.textContent = computerScore;
     }
+
+    // Fetch를 사용하여 Flask 서버에 데이터 전송
+    fetch('/update_score', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userScore, computerScore }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // 서버에서 반환한 데이터를 처리하는 부분 (옵션)
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
+
 
 
 function displayModal(compNum, result) {//compNum : 숫자 / result : 문자열
@@ -79,24 +96,6 @@ function displayModal(compNum, result) {//compNum : 숫자 / result : 문자열
             p.innerHTML = '튜터는 보를 냈습니다';
             break;
     }
-}
-
-function saveResultToDB(userChoice, compChoice, result) {
-    // AJAX 요청 생성
-    const xhr = new XMLHttpRequest();
-    
-    // Flask 서버의 엔드포인트 URL 설정
-    const url = `/save_result?user_choice=${userChoice}&comp_choice=${compChoice}&result=${result}`;
-
-    // 비동기적으로 서버로 데이터 전송
-    xhr.open("GET", url, true);
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // 서버 응답이 성공적으로 받아졌을 때 수행할 작업
-            console.log("데이터가 성공적으로 전송되었습니다.");
-        }
-    };
-    xhr.send();
 }
 
 function userRps(e) {
